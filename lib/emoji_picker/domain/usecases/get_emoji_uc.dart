@@ -18,10 +18,16 @@ class GetEmojiUcImpl implements GetEmojiUc {
     try {
       List<Emoji> emojis = await SharedPreferencesEmoji.instance.getEmoji();
       List<EmojiCategoryMap> emojiModel = await repository.getEmoji();
+      final recentEmojis = emojis.reversed.toList();
       return [
-        EmojiCategoryMap(parentCategory: 'Frequently Used', subCategories: [
-          {'Recent Used': emojis.reversed.toList().sublist(0, 10)}
-        ]),
+        if (recentEmojis.isNotEmpty)
+          EmojiCategoryMap(parentCategory: 'Frequently Used', subCategories: [
+            {
+              'Recent Used': recentEmojis.length > 10
+                  ? recentEmojis.sublist(0, 10)
+                  : recentEmojis
+            }
+          ]),
         ...emojiModel
       ];
     } catch (e) {
